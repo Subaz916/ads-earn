@@ -1,0 +1,14 @@
+{
+  "ads": [
+    {
+      "id": 1,
+      "name": "Ad 1",
+      "embedCode": ""
+    },
+    {
+      "id": 2,
+      "name": "Ad 2",
+      "embedCode": ""
+    }
+  ]
+}

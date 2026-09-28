@@ -1,0 +1,16 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+
+# logs & temp
+*.log
+npm-debug.log*
+*.tmp
+~$*
+
+# local-only ad config (do NOT commit real ad-network embed codes)
+ads.local.json

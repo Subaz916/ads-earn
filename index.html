@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ad Manager — Ad Slot Dashboard</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark">AM</div>
+      <div class="brand-text">
+        <strong>Ad Manager</strong>
+        <span>100-slot ad dashboard</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item active" data-view="admin">
+        <span class="nav-ico">&#9635;</span> Manage Ads
+      </button>
+      <button class="nav-item" data-view="display">
+        <span class="nav-ico">&#9723;</span> Ad Display
+      </button>
+    </nav>
+
+    <div class="side-block">
+      <h4>Storage</h4>
+      <p class="side-note">
+        Mode: <strong id="storageMode">localStorage</strong><br />
+        Key: <code>ads_config</code><br />
+        Slots: <strong>100</strong>
+      </p>
+    </div>
+
+    <div class="side-block">
+      <h4>Rules</h4>
+      <p class="side-note">
+        Only ad-network embed codes you personally own or are authorized to run
+        may be pasted here. Codes run as written &mdash; nothing is modified,
+        generated or auto-refreshed.
+      </p>
+    </div>
+
+    <div class="side-foot">v1.0 &middot; vanilla HTML / CSS / JS</div>
+  </aside>
+
+  <div class="scrim" id="scrim"></div>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <header class="topbar">
+      <button class="icon-btn only-mobile" id="menuBtn" aria-label="Menu">&#9776;</button>
+      <div class="page-head">
+        <h1 id="pageTitle">Manage Ads</h1>
+        <p id="pageSub">Add, edit and store your authorized ad embed codes.</p>
+      </div>
+      <div class="top-actions">
+        <button class="btn ghost" id="topExport">Export JSON</button>
+        <button class="btn primary" id="topRender">Render 100 Slots</button>
+      </div>
+    </header>
+
+    <!-- ---------- ADMIN VIEW ---------- -->
+    <section class="view" id="view-admin">
+
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-label">Configured ads</span>
+          <strong class="stat-value" id="statTotal">0</strong>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Filled slots</span>
+          <strong class="stat-value accent" id="statFilled">0</strong>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Empty slots</span>
+          <strong class="stat-value" id="statEmpty">100</strong>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Max capacity</span>
+          <strong class="stat-value">100</strong>
+        </div>
+      </div>
+
+      <!-- AD LIST -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Ad management table</h2>
+          <div class="panel-tools">
+            <input type="search" id="adSearch" class="input small" placeholder="Search name, id or slot..." />
+            <button class="btn ghost small" id="sortBySlot">Sort: slot</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th style="width:64px">ID</th>
+                <th>Ad name</th>
+                <th style="width:110px">Ad number</th>
+                <th style="width:120px">Code size</th>
+                <th style="width:170px">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adTableBody"></tbody>
+          </table>
+          <div class="empty-note" id="adTableEmpty" hidden>No ads yet &mdash; add your first one below.</div>
+        </div>
+      </div>
+
+      <!-- EDITOR -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Ad editor</h2>
+          <span class="chip" id="editorMode">New ad</span>
+        </div>
+
+        <div class="editor-grid">
+          <div class="field-row">
+            <label class="field">
+              <span>Ad Name</span>
+              <input type="text" id="adName" class="input" placeholder="Ad 1" maxlength="120" />
+            </label>
+            <label class="field">
+              <span>Ad number (slot 1&ndash;100)</span>
+              <select id="adSlot" class="input"></select>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>
+              Embed Code
+              <em class="hint">Paste the complete HTML / JavaScript embed code from your authorized ad network</em>
+            </span>
+            <textarea id="adCode" class="input code-editor" spellcheck="false" autocomplete="off"
+              placeholder="&lt;!-- ======= PASTE YOUR AD NETWORK EMBED CODE HERE ======= --&gt;&#10;&lt;script src=&quot;https://example-ad-network.com/ads.js&quot;&gt;&lt;/script&gt;"></textarea>
+          </label>
+
+          <label class="check fill-check">
+            <input type="checkbox" id="fillAllSlots" />
+            Apply this embed code to <strong>all 100 slots</strong> when saving
+          </label>
+
+          <div class="editor-foot">
+            <div class="btn-group">
+              <button class="btn primary" id="btnSave">Save</button>
+              <button class="btn" id="btnAddAd">Add Ad</button>
+              <button class="btn" id="btnEdit">Edit</button>
+              <button class="btn danger" id="btnDelete">Delete</button>
+              <button class="btn ghost" id="btnPreview">Preview</button>
+            </div>
+            <div class="status" id="editorStatus"></div>
+          </div>
+
+          <div class="preview-box" id="previewBox" hidden>
+            <div class="preview-head">
+              <span>Preview</span>
+              <button class="icon-btn" id="closePreview">&times;</button>
+            </div>
+            <div class="ad-slot preview-slot" id="previewSlot"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Configuration &amp; JSON storage</h2>
+        </div>
+        <div class="data-grid">
+          <div class="data-card">
+            <h3>Local mode</h3>
+            <p>Saved in the browser under the key <code>ads_config</code>. Works with no backend.</p>
+            <div class="btn-group">
+              <button class="btn" id="btnSaveLocal">Save configuration</button>
+              <button class="btn ghost" id="btnDiscard">Discard unsaved changes</button>
+            </div>
+          </div>
+          <div class="data-card">
+            <h3>JSON mode</h3>
+            <p>Export downloads <code>ads.json</code>. Import loads a file and uses it immediately.</p>
+            <div class="btn-group">
+              <button class="btn" id="btnExport">Export JSON</button>
+              <button class="btn" id="btnImport">Import JSON</button>
+              <input type="file" id="importFile" accept="application/json,.json" hidden />
+            </div>
+          </div>
+          <div class="data-card">
+            <h3>Bulk fill &mdash; 1 slot to 100</h3>
+            <p>Copy one ad's embed code into every other slot. Useful when your network requires the same ad in each slot.</p>
+            <select id="bulkSource" class="input small wide"></select>
+            <div class="btn-group">
+              <button class="btn" id="btnFillEmpty">Fill empty slots</button>
+              <button class="btn danger" id="btnFillAll">Replace all 100 slots</button>
+            </div>
+          </div>
+          <div class="data-card danger-card">
+            <h3>Danger zone</h3>
+            <p>Removes every configured ad from the app and from <code>ads_config</code>.</p>
+            <div class="btn-group">
+              <button class="btn danger" id="btnClearAll">Clear All</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ---------- DISPLAY VIEW ---------- -->
+    <section class="view" id="view-display" hidden>
+      <div class="display-bar">
+        <button class="btn primary" id="btnRender">Render 100 Slots</button>
+        <button class="btn ghost" id="btnClearDisplay">Clear</button>
+        <select id="slotFilter" class="input small">
+          <option value="all">All slots</option>
+          <option value="configured">Configured only</option>
+          <option value="empty">Empty only</option>
+        </select>
+        <input type="search" id="displaySearch" class="input small" placeholder="Filter by ad name..." />
+        <label class="check"><input type="checkbox" id="autoRender" checked /> Auto-render on load</label>
+      </div>
+
+      <div class="slots" id="slots"></div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<div class="modal-backdrop" id="modal" hidden>
+  <div class="modal">
+    <h3 id="modalTitle">Confirm</h3>
+    <p id="modalText"></p>
+    <div class="btn-group right">
+      <button class="btn ghost" id="modalCancel">Cancel</button>
+      <button class="btn danger" id="modalOk">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
